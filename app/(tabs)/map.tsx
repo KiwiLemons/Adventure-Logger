@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions, View, Touchable } from 'react-native';
+import { StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
 
 import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text } from '../../components/Themed';
@@ -9,7 +9,6 @@ import { GOOGLE_API_KEY } from '../../environments';
 import Constants from 'expo-constants';
 import { useRef, useState } from 'react';
 import MapViewDirections from 'react-native-maps-directions';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get("window");
 
@@ -69,6 +68,20 @@ export default function TabTwoScreen() {
     }
   }
 
+  const edgePadding = {
+    top: 100,
+    bottom: 100,
+    right: 100,
+    left: 100,
+  }
+
+  const traceRoute = () => {
+    if (origin && destination) {
+      setShowDirections(true)
+      mapRef.current?.fitToCoordinates([origin, destination], {edgePadding})
+    }
+  }
+
   const onPlaceSelected = (details: GooglePlaceDetail | null, flag: "origin" | "destination") => {
     const set = flag === "origin" ? setOrigin : setDestination
     const position = {
@@ -86,7 +99,7 @@ export default function TabTwoScreen() {
         style={styles.map} 
         provider={PROVIDER_GOOGLE} 
         initialRegion={INTIAL_POSITION} 
-      />
+      >
         {origin && <Marker coordinate={origin} />}
         {destination && <Marker coordinate={destination} />}
         {showDirections && origin && destination && (
@@ -94,18 +107,20 @@ export default function TabTwoScreen() {
           origin={origin}
           destination={destination}
           apikey={GOOGLE_API_KEY}
+          strokeColor='#6644ff'
+          strokeWidth={4}
         />
       )}
-
+      </MapView>
+      
       <View style={styles.searchContainer}>
         <InputAutocomplete label="Origin" onPlaceSelected={(details) => {onPlaceSelected(details, "origin")}} />
         <InputAutocomplete label="Destination" onPlaceSelected={(details) => {onPlaceSelected(details, "destination")}} />
         
-        <TouchableOpacity style={styles.button} onPress={() => setShowDirections(true)}>
+        <TouchableOpacity style={styles.button} onPress={traceRoute}>
           <Text style={styles.buttonText}>Trace Route</Text>
         </TouchableOpacity>
-      </View>
-      
+      </View> 
     </View>
   );
 }
@@ -130,7 +145,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width:2, height:2},
     shadowOpacity: 0.5,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
     padding: 8,
     borderRadius: 8,
     top: Constants.statusBarHeight,
