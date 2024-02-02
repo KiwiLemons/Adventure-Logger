@@ -1,18 +1,12 @@
+import React, { useRef, useState } from 'react';
 import { StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
-
-import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text } from '../../components/Themed';
-
-import MapView, { LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_API_KEY } from '../../environments';
-import Constants from 'expo-constants';
-import { useRef, useState } from 'react';
 import MapViewDirections from 'react-native-maps-directions';
 
 const { width, height } = Dimensions.get("window");
-
-
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.02;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
@@ -54,10 +48,10 @@ function InputAutocomplete({
 }
 
 export default function TabTwoScreen() {
-
   const [origin, setOrigin] = useState<LatLng | null>()
   const [destination, setDestination] = useState<LatLng | null>()
   const [showDirections, setShowDirections] = useState(false)
+  const [distance, setDistance] = useState<number | null>(null); // State to hold distance
   const mapRef = useRef<MapView>(null)
 
   const moveTo = async (position: LatLng) => {
@@ -79,6 +73,9 @@ export default function TabTwoScreen() {
     if (origin && destination) {
       setShowDirections(true)
       mapRef.current?.fitToCoordinates([origin, destination], {edgePadding})
+      // Calculate distance between origin and destination
+      const routeDistance = calculateDistance(origin.latitude, origin.longitude, destination.latitude, destination.longitude);
+      setDistance(routeDistance);
     }
   }
 
@@ -92,6 +89,24 @@ export default function TabTwoScreen() {
     moveTo(position)
   };
 
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    const dLon = deg2rad(lon2 - lon1); 
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+              Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+    const d = R * c; // Distance in km
+    // Convert km to miles
+    const miles = d * 0.621371;
+    return miles;
+  }
+  
+  const deg2rad = (deg: number) => {
+    return deg * (Math.PI / 180)
+  }
+
   return (
     <View style={styles.container}>
       <MapView 
@@ -104,13 +119,13 @@ export default function TabTwoScreen() {
         {destination && <Marker coordinate={destination} />}
         {showDirections && origin && destination && (
           <MapViewDirections
-          origin={origin}
-          destination={destination}
-          apikey={GOOGLE_API_KEY}
-          strokeColor='#6644ff'
-          strokeWidth={4}
-        />
-      )}
+            origin={origin}
+            destination={destination}
+            apikey={GOOGLE_API_KEY}
+            strokeColor='#6644ff'
+            strokeWidth={4}
+          />
+        )}
       </MapView>
       
       <View style={styles.searchContainer}>
@@ -120,6 +135,8 @@ export default function TabTwoScreen() {
         <TouchableOpacity style={styles.button} onPress={traceRoute}>
           <Text style={styles.buttonText}>Trace Route</Text>
         </TouchableOpacity>
+        
+        {distance && <Text style={styles.distanceText}>Distance: {distance.toFixed(2)} mi</Text>}
       </View> 
     </View>
   );
@@ -148,7 +165,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     padding: 8,
     borderRadius: 8,
-    top: Constants.statusBarHeight,
+    top: 10,
   },
   input: {
     borderColor: "#888",
@@ -156,20 +173,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#bbb",
-    paddingVertical: 12,
-    MarginTop: 16,
+    paddingVertical: 8,
+    marginTop: 16,
     borderRadius: 4,
   },
   buttonText: {
     textAlign: "center",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  distanceText: {
+    textAlign: "center",
+    marginTop: 8,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-   }, 
 });
