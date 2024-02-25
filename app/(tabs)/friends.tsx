@@ -2,9 +2,23 @@ import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Text, View } from '../../components/Themed';
 
+const savedRoutes = [
+  { id: 1, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 2, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 3, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 4, fid: 2, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 5, fid: 2, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 6, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 7, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 8, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 9, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 10, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+];
+
 export default function FriendsScreen() {
   const [selectedFriend, setSelectedFriend] = useState(null);
-  
+  const [routes, setRoutes] = useState([]);
+
   const friends = [
     { id: 1, name: 'John', profileImage: require('../../assets/images/carl.jpg') },
     { id: 2, name: 'Alice', profileImage: require('../../assets/images/DonClawleone.jpg') },
@@ -13,10 +27,14 @@ export default function FriendsScreen() {
 
   const handleFriendSelect = (friend) => {
     setSelectedFriend(friend);
+    // Filter the routes for the selected friend
+    const friendRoutes = savedRoutes.filter(route => route.fid === friend.id);
+    setRoutes(friendRoutes);
   };
 
   const handleCloseRoutes = () => {
     setSelectedFriend(null);
+    setRoutes([]);
   };
 
   return (
@@ -37,11 +55,19 @@ export default function FriendsScreen() {
       
       {selectedFriend && (
         <View style={styles.routesTab}>
-          <Text style={styles.routesTitle}>Routes for {selectedFriend.name}</Text>
-          {/* Your routes component goes here */}
-          <TouchableOpacity style={styles.closeButton} onPress={handleCloseRoutes}>
-            <Text style={styles.closeButtonText}>X</Text>
-          </TouchableOpacity>
+          <View style={styles.routesHeader}>
+            <Text style={styles.routesTitle}>Routes</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={handleCloseRoutes}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+          {routes.map(route => (
+            <View key={route.id} style={styles.route}>
+              <Text>Origin: {route.origin}</Text>
+              <Text>Destination: {route.destination}</Text>
+              <Text>Distance: {route.distance}</Text>
+            </View>
+          ))}
         </View>
       )}
     </View>
@@ -88,20 +114,27 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  routesHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    marginBottom: 10,
   },
   routesTitle: {
     fontWeight: 'bold',
     fontSize: 16,
   },
+  route: {
+    marginBottom: 10,
+  },
   closeButton: {
     backgroundColor: '#ccc',
     padding: 10,
     borderRadius: 20,
+    alignSelf: 'flex-end',
   },
   closeButtonText: {
     fontSize: 16,
