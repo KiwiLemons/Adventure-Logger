@@ -3,9 +3,9 @@ import { StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
 import { Text } from '../../components/Themed';
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { GOOGLE_API_KEY } from '../../environments';
 import MapViewDirections from 'react-native-maps-directions';
 
+const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.02;

@@ -1,46 +1,65 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Button } from 'react-native';
 import React, { useState, useEffect } from 'react';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import { Text, View} from '../components/Themed';
+import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 
+const LOCATION_TASK_NAME = 'background-location-task';
+
+const requestPermissions = async () => {
+  const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+  if (foregroundStatus === 'granted') {
+    const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+    if (backgroundStatus === 'granted') {
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.Highest,
+        deferredUpdatesInterval: 1000
+      });
+    }
+  }
+};
+
+const stopTask = async () => {
+  await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+}
+
 export default function ModalScreen() {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [backgroundLocaton, setBackgroundLocation] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
+    let TaskStatus = TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
+    TaskStatus.then((value) => {
+      setBackgroundLocation(value)
+    });
+  }, [])
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
-
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
-
+  console.log(backgroundLocaton);
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text>{text}</Text>
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      <Text style={styles.title}>Modal</Text>
+      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      {backgroundLocaton == false ? 
+        (<Button onPress={requestPermissions} title="Enable background location" />)
+        : <Button onPress={stopTask} title="Disable background location" />}
     </View>
   );
 }
+
+TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+  if (error) {
+    // Error occurred - check `error.message` for more details.
+    console.log(error.message)
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    console.log(locations)
+    // do something with the locations captured in the background
+  }
+});
 
 const styles = StyleSheet.create({
   container: {
