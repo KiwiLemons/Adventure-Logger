@@ -4,15 +4,15 @@ import { Text, View } from '../../components/Themed';
 
 const savedRoutes = [
   { id: 1, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 2, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 3, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 4, fid: 2, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 5, fid: 2, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 6, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 7, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 8, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 9, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
-  { id: 10, fid: 3, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 2, fid: 1, origin: '307 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 3, fid: 1, origin: '306 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 4, fid: 2, origin: '305 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 5, fid: 2, origin: '304 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 6, fid: 3, origin: '303 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 7, fid: 3, origin: '302 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 8, fid: 3, origin: '301 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 9, fid: 3, origin: '309 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 10, fid: 3, origin: '310 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
 ];
 
 export default function FriendsScreen() {
@@ -20,9 +20,9 @@ export default function FriendsScreen() {
   const [routes, setRoutes] = useState([]);
 
   const friends = [
-    { id: 1, name: 'John', profileImage: require('../../assets/images/carl.jpg') },
-    { id: 2, name: 'Alice', profileImage: require('../../assets/images/DonClawleone.jpg') },
-    { id: 3, name: 'Bob', profileImage: require('../../assets/images/SignsMelGibson.jpg') }
+    { id: 1, name: 'Austen', profileImage: require('../../assets/images/carl.jpg') },
+    { id: 2, name: 'Kade  ', profileImage: require('../../assets/images/DonClawleone.jpg') },
+    { id: 3, name: 'Jaden ', profileImage: require('../../assets/images/SignsMelGibson.jpg') }
   ];
 
   const handleFriendSelect = (friend) => {
