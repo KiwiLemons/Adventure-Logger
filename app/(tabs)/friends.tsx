@@ -1,14 +1,75 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '../../components/EditScreenInfo';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Text, View } from '../../components/Themed';
 
-export default function TabTwoScreen() {
+const savedRoutes = [
+  { id: 1, fid: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 2, fid: 1, origin: '307 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 3, fid: 1, origin: '306 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 4, fid: 2, origin: '305 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 5, fid: 2, origin: '304 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 6, fid: 3, origin: '303 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 7, fid: 3, origin: '302 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 8, fid: 3, origin: '301 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 9, fid: 3, origin: '309 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+  { id: 10, fid: 3, origin: '310 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
+];
+
+export default function FriendsScreen() {
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [routes, setRoutes] = useState([]);
+
+  const friends = [
+    { id: 1, name: 'Austen', profileImage: require('../../assets/images/carl.jpg') },
+    { id: 2, name: 'Kade  ', profileImage: require('../../assets/images/DonClawleone.jpg') },
+    { id: 3, name: 'Jaden ', profileImage: require('../../assets/images/SignsMelGibson.jpg') }
+  ];
+
+  const handleFriendSelect = (friend) => {
+    setSelectedFriend(friend);
+    // Filter the routes for the selected friend
+    const friendRoutes = savedRoutes.filter(route => route.fid === friend.id);
+    setRoutes(friendRoutes);
+  };
+
+  const handleCloseRoutes = () => {
+    setSelectedFriend(null);
+    setRoutes([]);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <Text style={styles.title}>Friends</Text>
+      <ScrollView contentContainerStyle={styles.friendsList}>
+        {friends.map(friend => (
+          <TouchableOpacity 
+            key={friend.id} 
+            style={styles.friendItem} 
+            onPress={() => handleFriendSelect(friend)}
+          >
+            <Image source={friend.profileImage} style={styles.profileImage} />
+            <Text style={styles.friendName}>{friend.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      
+      {selectedFriend && (
+        <View style={styles.routesTab}>
+          <View style={styles.routesHeader}>
+            <Text style={styles.routesTitle}>Routes</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={handleCloseRoutes}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+          {routes.map(route => (
+            <View key={route.id} style={styles.route}>
+              <Text>Origin: {route.origin}</Text>
+              <Text>Destination: {route.destination}</Text>
+              <Text>Distance: {route.distance}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -16,16 +77,68 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  friendsList: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
+  friendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 20,
+  },
+  friendName: {
+    fontSize: 18,
     fontWeight: 'bold',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  routesTab: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  routesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  routesTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  route: {
+    marginBottom: 10,
+  },
+  closeButton: {
+    backgroundColor: '#ccc',
+    padding: 10,
+    borderRadius: 20,
+    alignSelf: 'flex-end',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
