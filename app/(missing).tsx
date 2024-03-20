@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
+import { setUser_id }  from './globals';
 
 export default function LoginScreen() {
   const navigation = useNavigation(); // Initialize navigation hook
   const [Username, setUsername] = useState('');
   const [Password, setPassword] = useState('');
-  const [user_id, setUser_id] = useState('');
-  window.user_id = 1;
 
   const handleLogin = async () => {
     // Navigate to other screens here
@@ -38,7 +37,6 @@ export default function LoginScreen() {
     }
 
     response.text().then(data => setUser_id(data));
-    console.log(user_id)
     navigation.navigate('routes');
   };
 
@@ -58,7 +56,7 @@ export default function LoginScreen() {
         onChangeText={text => setPassword(text)}
       />
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login for {window.user_id}</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
     </View>
   );

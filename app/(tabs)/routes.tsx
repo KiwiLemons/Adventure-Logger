@@ -2,14 +2,15 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
+import { getUser_id } from '../globals';
 
 const savedRoutes = [
   { id: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
 ];
 
-console.log(global.user_id)
 
 export default function TabOneScreen() {
+
   const navigation = useNavigation();
 
   const renderRoutePreview = ({ item }) => {
@@ -28,7 +29,7 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Saved Routes for {window.user_id}</Text>
+      <Text style={styles.title}>Saved Routes</Text>
       <FlatList
         data={savedRoutes}
         renderItem={renderRoutePreview}
