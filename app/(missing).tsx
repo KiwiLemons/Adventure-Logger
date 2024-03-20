@@ -1,16 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 
 export default function LoginScreen() {
   const navigation = useNavigation(); // Initialize navigation hook
+  const [Username, setUsername] = useState('');
+  const [Password, setPassword] = useState('');
+  const [user_id, setUser_id] = useState('');
+  window.user_id = 1;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Navigate to other screens here
     // For example, navigate to HomeScreen
+
+    //Validate login
+    const user = {
+      Username: Username,
+      Password: Password
+    };
+    const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/login';
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    }); 
+    if (response.status == 404){
+      console.log("Invalid credentials");
+      return;
+    }
+    if (response.status != 200){
+      console.log(response.status)
+      return;
+    }
+
+    response.text().then(data => setUser_id(data));
+    console.log(user_id)
     navigation.navigate('routes');
   };
+
 
   return (
     <View style={styles.container}>
@@ -18,14 +49,16 @@ export default function LoginScreen() {
       <TextInput
         style={styles.input}
         placeholder="Username"
+        onChangeText={text => setUsername(text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         secureTextEntry
+        onChangeText={text => setPassword(text)}
       />
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Login for {window.user_id}</Text>
       </TouchableOpacity>
     </View>
   );
