@@ -17,7 +17,7 @@ export default function TabTwoScreen() {
         style={isDarkMode ? [styles.separator, { backgroundColor: 'rgba(255,255,255,0.1)' }] : styles.separator}
       />
       <View style={isDarkMode ? [styles.switchContainer, styles.darkSwitchContainer] : styles.switchContainer}>
-        <Text style={isDarkMode ? styles.darkText : null}>Dark Mode</Text>
+        <Text style={isDarkMode ? styles.darkText : null} >Toggle Theme</Text>
         <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
       </View>
     </View>
@@ -27,8 +27,8 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 20,
+    alignItems: 'flex-start',
   },
   darkContainer: {
     backgroundColor: 'black',
