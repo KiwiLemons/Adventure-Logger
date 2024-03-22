@@ -1,64 +1,20 @@
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Link, Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
+
 import { Text, View } from '../components/Themed';
-import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
-import { setUser_id }  from './globals';
 
-export default function LoginScreen() {
-  const navigation = useNavigation(); // Initialize navigation hook
-  const [Username, setUsername] = useState('');
-  const [Password, setPassword] = useState('');
-
-  const handleLogin = async () => {
-    // Navigate to other screens here
-    // For example, navigate to HomeScreen
-
-    //Validate login
-    const user = {
-      Username: Username,
-      Password: Password
-    };
-    const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/login';
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
-    }); 
-    if (response.status == 404){
-      console.log("Invalid credentials");
-      return;
-    }
-    if (response.status != 200){
-      console.log(response.status)
-      return;
-    }
-
-    response.text().then(data => setUser_id(data));
-    navigation.navigate('routes');
-  };
-
-
+export default function NotFoundScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        onChangeText={text => setUsername(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        onChangeText={text => setPassword(text)}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </View>
+    <>
+      <Stack.Screen options={{ title: 'Oops!' }} />
+      <View style={styles.container}>
+        <Text style={styles.title}>This screen doesn't exist.</Text>
+
+        <Link href="/" style={styles.link}>
+          <Text style={styles.linkText}>Go to home screen!</Text>
+        </Link>
+      </View>
+    </>
   );
 }
 
@@ -70,29 +26,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
   },
-  input: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
+  link: {
+    marginTop: 15,
+    paddingVertical: 15,
   },
-  button: {
-    backgroundColor: '#2e78b7',
-    paddingVertical: 12,
-    paddingHorizontal: 50,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  linkText: {
+    fontSize: 14,
+    color: '#2e78b7',
   },
 });
