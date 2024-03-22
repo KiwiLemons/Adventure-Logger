@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
+import { getUser_id } from '../globals';
 
 const savedRoutes = [
   { id: 1, origin: '308 Penny Ln, Ruston, LA, USA', destination: '811 Saratoga Street, Ruston, LA, USA', distance: '0.71 miles' },
 ];
 
+
 export default function TabOneScreen() {
+
   const navigation = useNavigation();
+  const [user_id, setuser_id] = useState('')
+
+  useEffect(() => {
+    setuser_id(getUser_id());
+  }, []);
 
   const renderRoutePreview = ({ item }) => {
     const { origin, destination } = item;
@@ -26,7 +34,7 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Saved Routes</Text>
+      <Text style={styles.title}>Saved Routes for {user_id}</Text>
       <FlatList
         data={savedRoutes}
         renderItem={renderRoutePreview}

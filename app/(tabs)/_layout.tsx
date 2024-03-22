@@ -25,7 +25,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       }}>
       <Tabs.Screen
-        name="routes"
+        name="index"
         options={{
           title: 'Routes',
           tabBarIcon: ({ color }) => <FontAwesome5 name="route" size={24} color={color} />,
