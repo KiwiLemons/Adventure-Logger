@@ -6,14 +6,9 @@ import { useTheme } from '../../contexts/ThemeContext';
 export default function TabTwoScreen() {
   const navigation = useNavigation(); // Initialize navigation hook
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const toggleDarkMode = () => {
     setIsDarkMode(prevMode => !prevMode);
-  };
-
-  const toggleNotifications = () => {
-    setNotificationsEnabled(prevState => !prevState);
   };
 
   const handleSignOut = () => {
@@ -28,10 +23,6 @@ export default function TabTwoScreen() {
       <View style={isDarkMode ? [styles.settingContainer, styles.darkSettingContainer] : styles.settingContainer}>
         <Text style={isDarkMode ? styles.darkText : null}>Toggle Theme</Text>
         <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
-      </View>
-      <View style={isDarkMode ? [styles.settingContainer, styles.darkSettingContainer] : styles.settingContainer}>
-        <Text style={isDarkMode ? styles.darkText : null}>Enable Notifications</Text>
-        <Switch value={notificationsEnabled} onValueChange={toggleNotifications} />
       </View>
       <TouchableOpacity style={isDarkMode ? [styles.signOutButton, styles.darkSignOutButton] : styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Sign Out</Text>
@@ -63,7 +54,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 20,
   },
   darkSettingContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -77,7 +68,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     backgroundColor: '#FF6347',
-    borderRadius: 5,
+    borderRadius: 20,
     padding: 15,
     alignItems: 'center',
   },
