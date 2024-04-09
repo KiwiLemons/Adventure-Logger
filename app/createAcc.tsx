@@ -9,7 +9,7 @@ function SignupScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/signUp';
+  const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/';
 
   const handleSignup = () => {
     const user = {

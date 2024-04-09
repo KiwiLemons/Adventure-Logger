@@ -5,6 +5,7 @@ import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_API_KEY } from '../../environments';
 import MapViewDirections from 'react-native-maps-directions';
+import { getUser_id } from '../globals';
 
 //const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY
 const { width, height } = Dimensions.get("window");

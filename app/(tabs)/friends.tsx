@@ -1,51 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, Image, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, Text, View, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 import { getUser_id } from '.././globals';
-import placeholderImage from '.././assets/adaptive-icon.png';
-
-
-const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${getUser_id()}/following`;
+import placeholderImage from '../../assets/images/defaultPFP.jpg'; // Import default profile picture
 
 export default function FriendsScreen() {
-  const [followingList, setFollowingList] = useState([]);
+  const navigation = useNavigation(); // Initialize navigation hook
+  const [followedUsers, setFollowedUsers] = useState([]);
+  const [errorVisible, setErrorVisible] = useState(false);
 
   useEffect(() => {
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        // Ensure that following is always an array
-        const updatedData = data.map(user => ({
-          ...user,
-          following: Array.isArray(user.following) ? user.following : [user.following]
-        }));
-        setFollowingList(updatedData);
-      })
-      .catch(error => {
-        console.error('Error fetching following list:', error);
-      });
+    const fetchFollowedUsers = async () => {
+      try {
+        const user_id = getUser_id();
+        const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/following`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setFollowedUsers(data);
+      } catch (error) {
+        console.error('Error fetching followed users:', error);
+        setErrorVisible(true);
+      }
+    };
+
+    fetchFollowedUsers();
   }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Friends</Text>
+      {errorVisible && <Text style={styles.error}>Error fetching followed users</Text>}
       <ScrollView style={styles.friendsList}>
-        {followingList.map(user => (
-          <View key={user.user_id}>
+        {followedUsers.map(user => (
+          <View key={user.user_id} style={styles.userContainer}>
+            <Image
+              source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+              style={styles.profileImage}
+            />
             <Text style={styles.userName}>{user.userName}</Text>
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {user.following.map(followedUser => (
-              // Check if followedUser is defined
-              followedUser && (
-                <TouchableOpacity key={followedUser.user_id} style={styles.friendItem}>
-                  <Image
-                    style={styles.profileImage}
-                    source={{ uri: followedUser.profile_picture || placeholderImage }}
-                  />
-                  <Text style={styles.friendName}>{followedUser.userName}</Text>
-                </TouchableOpacity>
-              )
-            ))}
-            </ScrollView>
           </View>
         ))}
       </ScrollView>
@@ -67,23 +64,23 @@ const styles = StyleSheet.create({
   friendsList: {
     flexGrow: 1,
   },
+  userContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
   userName: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
-  friendItem: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 5,
-  },
-  friendName: {
+  error: {
+    color: '#fc3a3d',
     fontSize: 16,
     fontWeight: 'bold',
   },
