@@ -10,7 +10,8 @@ const UserModal = ({ visible, user, onClose, onFollow, onUnfollow }) => {
 
   const handleFollow = async () => {
     try {
-      const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${getUser_id()}&to=${user.user_id}`, {
+      const user_id = getUser_id();
+      const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${user.user_id}`, {
         method: 'POST',
       });
       if (!response.ok) {
@@ -25,7 +26,8 @@ const UserModal = ({ visible, user, onClose, onFollow, onUnfollow }) => {
   
   const handleUnfollow = async () => {
     try {
-      const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${getUser_id()}&to=${user.user_id}`, {
+      const user_id = getUser_id();
+      const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${user.user_id}`, {
         method: 'POST',
       });
       if (!response.ok) {
