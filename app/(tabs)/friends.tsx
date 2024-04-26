@@ -61,9 +61,7 @@ export default function FriendsScreen() {
   const filteredFollowedUsers = followedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
-  const filteredNotFollowedUsers = notFollowedUsers.filter(user =>
-    user.userName.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredNotFollowedUsers = notFollowedUsers.filter(user => user.user_id !== getUser_id());
 
   // Update follow and unfollow functions in FriendsScreen component
   const handleFollow = (userId) => {
@@ -134,49 +132,80 @@ export default function FriendsScreen() {
         visible={isModalVisible}
         user={selectedUser}
         onClose={hideUserModal}
+        setFollowedUsers={setFollowedUsers}
+        followedUsers={followedUsers}
       />
     </View>
   );
-}
+};
 
 // Modal Component for User Account
-const UserModal = ({ visible, user, onClose, onFollow, onUnfollow }) => {
+const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) => {
   if (!visible || !user) return null;
 
-  // Modify handleFollow and handleUnfollow functions in UserModal component
-  // Update follow and unfollow functions in FriendsScreen component
-  const handleFollow = async (userId) => {
+  const [userRoutes, setUserRoutes] = useState([]);
+  const [isFollowed, setIsFollowed] = useState(false);
+
+  useEffect(() => {
+    const fetchUserRoutes = async () => {
+      try {
+        const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user.user_id}/routes`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user routes');
+        }
+        const data = await response.json();
+        setUserRoutes(data);
+      } catch (error) {
+        console.error('Error fetching user routes:', error);
+      }
+    };
+
+    const checkIsFollowed = () => {
+      setIsFollowed(followedUsers.some(followedUser => followedUser.user_id === user.user_id));
+    };
+
+    if (visible && user) {
+      fetchUserRoutes();
+      checkIsFollowed();
+    }
+  }, [visible, user, followedUsers]);
+
+  // Follow/unfollow handlers
+  const handleFollow = async () => {
     try {
       const user_id = getUser_id();
-      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${userId}`;
-      const response = await fetch(url);
+      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${user.user_id}`;
+      const response = await fetch(url, {
+        method: 'GET',
+      });
       if (!response.ok) {
         throw new Error('Failed to follow user');
       }
       // Update followed users list with user ID
-      setFollowedUsers([...followedUsers, userId]);
+      setFollowedUsers([...followedUsers, user]);
+      setIsFollowed(true);
     } catch (error) {
       console.error('Error following user:', error.message);
     }
   };
 
-  const handleUnfollow = async (userId) => {
+  const handleUnfollow = async () => {
     try {
       const user_id = getUser_id();
-      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${userId}`;
+      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${user.user_id}`;
       const response = await fetch(url, {
-        method: 'POST',
+        method: 'GET',
       });
       if (!response.ok) {
         throw new Error('Failed to unfollow user');
       }
       // Update followed users list by filtering out the user ID
-      setFollowedUsers(followedUsers.filter(id => id !== userId));
+      setFollowedUsers(followedUsers.filter(followedUser => followedUser.user_id !== user.user_id));
+      setIsFollowed(false);
     } catch (error) {
       console.error('Error unfollowing user:', error);
     }
   };
-
 
   return (
     <Modal animationType="slide" transparent visible={visible}>
@@ -192,14 +221,32 @@ const UserModal = ({ visible, user, onClose, onFollow, onUnfollow }) => {
           <Text style={styles.modalUserName}>{user.userName}</Text>
 
           {/* Follow/Unfollow buttons */}
-          {user.following ? (
-            <TouchableOpacity onPress={handleUnfollow} style={styles.button}>
+          {isFollowed ? (
+            <TouchableOpacity onPress={handleUnfollow} style={styles.unfollowButton}>
               <Text style={styles.buttonText}>Unfollow</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={handleFollow} style={styles.button}>
+            <TouchableOpacity onPress={handleFollow} style={styles.followButton}>
               <Text style={styles.buttonText}>Follow</Text>
             </TouchableOpacity>
+          )}
+
+          {/* Display user routes or message */}
+          {isFollowed ? (
+            <ScrollView horizontal style={styles.routeContainer}>
+              {userRoutes.map(route => (
+                <View key={route.route_id} style={styles.route}>
+                  <Image
+                    source={route.image ? { uri: route.image } : require('../../assets/images/MapPlaceholder.jpg')}
+                    style={styles.routeImage}
+                  />
+                  <Text style={styles.routeName}>{route.name}</Text>
+                  <Text style={styles.routeDistance}>{route.distance} mi</Text>
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.followMessage}>Follow to view routes</Text>
           )}
         </View>
       </View>
@@ -290,6 +337,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center', // Center text
   },
+  routeContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    marginBottom: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  route: {
+    marginRight: 20,
+    alignItems: 'center',
+  },
+  routeImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
   closeButton: {
     position: 'absolute',
     top: 10,
@@ -297,6 +361,24 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 20,
+    fontWeight: 'bold',
+  },
+  followButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  unfollowButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
     fontWeight: 'bold',
   },
 });

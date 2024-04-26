@@ -4,7 +4,7 @@ import { Text } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
 import { getUser_id } from '../globals';
 
-const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/';
+const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/1/routes';
 
 export default function TabOneScreen() {
   const navigation = useNavigation();
@@ -14,6 +14,7 @@ export default function TabOneScreen() {
 
   useEffect(() => {
     setuser_id(getUser_id());
+    // TODO: Fix this updating everytime you go back even though you do not create a new route
     fetchRoutes();
   }, []);
 
@@ -29,13 +30,6 @@ export default function TabOneScreen() {
       console.error('Error fetching routes:', error);
     }
   };
-
-  // Hardcoded fake routes
-  const fakeRoutes = [
-    { route_id: 1, name: 'Route 1', distance: '10 miles' },
-    { route_id: 2, name: 'Route 2', distance: '5 miles' },
-    { route_id: 3, name: 'Route 3', distance: '8 miles' },
-  ];
 
   const sortRoutesByDistance = () => {
     const sortedRoutes = [...routes].sort((a, b) => {
@@ -55,12 +49,12 @@ export default function TabOneScreen() {
     return (
       <TouchableOpacity
         style={styles.routePreview}
-        onPress={() => navigation.navigate('map', { origin: item.origin, destination: item.destination })}
+        onPress={() => navigation.navigate('viewRoute', item)}
       >
         <Image source={require('../../assets/images/MapPlaceholder.jpg')} style={styles.routeImage} />
         <View style={styles.routeInfoContainer}>
           <Text style={styles.routeName}>{name}</Text>
-          <Text style={styles.routeDistance}>{distance}</Text>
+          <Text style={styles.routeDistance}>{distance} mi</Text>
         </View>
       </TouchableOpacity>
     );
@@ -69,7 +63,7 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={fakeRoutes} // Use fakeRoutes instead of routes
+        data={routes}
         renderItem={renderRoutePreview}
         keyExtractor={item => item.route_id.toString()}
         contentContainerStyle={styles.routeList} // Apply styles to the content container
