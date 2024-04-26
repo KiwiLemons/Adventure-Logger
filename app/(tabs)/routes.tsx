@@ -33,11 +33,11 @@ export default function TabOneScreen() {
 
   // Hardcoded fake routes
   const fakeRoutes = [
-    { route_id: 1, name: 'Route 1', distance: '10 miles' },
-    { route_id: 2, name: 'Route 2', distance: '5 miles' },
-    { route_id: 3, name: 'Route 3', distance: '8 miles' },
-    { route_id: 4, name: 'Route 4', distance: '12 miles' },
-    { route_id: 5, name: 'Route 5', distance: '6 miles' },
+    { route_id: 1, name: 'Route 1', distance: '10' },
+    { route_id: 2, name: 'Route 2', distance: '5' },
+    { route_id: 3, name: 'Route 3', distance: '8' },
+    { route_id: 4, name: 'Route 4', distance: '12' },
+    { route_id: 5, name: 'Route 5', distance: '6' },
   ];
 
   const sortRoutesByDistance = () => {
@@ -58,12 +58,12 @@ export default function TabOneScreen() {
     return (
       <TouchableOpacity
         style={styles.routePreview}
-        onPress={() => navigation.navigate('map', { origin: item.origin, destination: item.destination })}
+        onPress={() => navigation.navigate('viewRoute', item)}
       >
         <Image source={require('../../assets/images/MapPlaceholder.jpg')} style={styles.routeImage} />
         <View style={styles.routeInfoContainer}>
           <Text style={styles.routeName}>{name}</Text>
-          <Text style={styles.routeDistance}>{distance}</Text>
+          <Text style={styles.routeDistance}>{distance} mi</Text>
         </View>
       </TouchableOpacity>
     );
@@ -72,7 +72,7 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={routes} // Use fakeRoutes instead of routes
+        data={routes}
         renderItem={renderRoutePreview}
         keyExtractor={item => item.route_id.toString()}
         contentContainerStyle={styles.routeList} // Apply styles to the content container
