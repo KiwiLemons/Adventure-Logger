@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { Text, View } from '../components/Themed';
+import { StyleSheet, TextInput, TouchableOpacity, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 import { setUser_id }  from './globals';
 
@@ -63,6 +62,9 @@ export default function LoginScreen() {
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("createAcc")}>
+        <Text style={styles.registerText}>Don't have an account? Register here</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -89,11 +91,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: '#2e78b7',
-    paddingVertical: 12,
+    backgroundColor: 'blue',
+    paddingVertical: 10,
     paddingHorizontal: 50,
     borderRadius: 5,
     marginTop: 10,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
@@ -104,5 +107,9 @@ const styles = StyleSheet.create({
     color: '#fc3a3d',
     fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
+  registerText: {
+    marginTop: 20,
+    textDecorationLine: 'underline',
+  },
 });

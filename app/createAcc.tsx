@@ -1,77 +1,92 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { Text, View } from '../components/Themed';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
-import { setUser_id }  from './globals';
 
-export default function LoginScreen() {
+function SignupScreen() {
   const navigation = useNavigation(); // Initialize navigation hook
-  const [Username, setUsername] = useState('');
-  const [Password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/';
 
-  const handleLogin = async () => {
-    // Navigate to other screens here
-    // For example, navigate to HomeScreen
-
-    //Validate login
+  const handleSignup = () => {
     const user = {
-      Username: Username,
-      Password: Password
+      userName: username,
+      password: password
     };
-    const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/login';
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
-    }); 
-    if (response.status == 404){
-      console.log("Invalid credentials");
-      return;
+    if (password !== confirmPassword) {
+      Alert.alert('Passwords do not match');
+    } else {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      })
+        .then(response => response.text())
+        .then(data => {
+          navigation.navigate('index');
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     }
-    if (response.status != 200){
-      console.log(response.status)
-      return;
-    }
-
-    response.text().then(data => setUser_id(data));
-    navigation.navigate("(tabs)");
   };
-
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.heading}>Register</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={text => setEmail(text)}
+      />
       <TextInput
         style={styles.input}
         placeholder="Username"
+        value={username}
         onChangeText={text => setUsername(text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
-        secureTextEntry
+        value={password}
         onChangeText={text => setPassword(text)}
+        secureTextEntry={true}
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChangeText={text => setConfirmPassword(text)}
+        secureTextEntry={true}
+      />
+      <TouchableOpacity style={styles.button} onPress={handleSignup}>
+        <Text style={styles.buttonText}>Register</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("index")}>
+        <Text style={styles.loginText}>Already have an account? Login here</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
+
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
   },
-  title: {
+  heading: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 20,
   },
   input: {
@@ -80,19 +95,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
+    marginBottom: 20,
     paddingHorizontal: 10,
-    marginBottom: 10,
   },
   button: {
-    backgroundColor: '#2e78b7',
-    paddingVertical: 12,
-    paddingHorizontal: 50,
+    backgroundColor: 'blue',
+    padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
-    fontWeight: 'bold',
+  },
+  loginText: {
+    marginTop: 20,
+    textDecorationLine: 'underline',
   },
 });
