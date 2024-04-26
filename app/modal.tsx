@@ -1,114 +1,138 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet, Button, Switch } from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
+import { Platform, StyleSheet, Button, TouchableOpacity, Pressable, useColorScheme } from 'react-native';
+import { useNavigation } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { Text, View } from '../components/Themed';
-import * as TaskManager from 'expo-task-manager';
-import * as Location from 'expo-location';
 import Colors from '../constants/Colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { TextInput } from 'react-native-gesture-handler';
+import { getUser_id } from './globals';
 
-const LOCATION_TASK_NAME = 'background-location-task';
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-
-const postRequest = async (requestOptions:object) => {
-  try {
-    await fetch(
-      `${BACKEND_URL}/api/routes`, requestOptions)
-      .then(response => {
-        response.json()
-          .then(data => {
-            alert("Post created");
-            console.log(data);
-          });
-      })
-  }
-  catch (error) {
-    console.error(error);
-  }
-}
 
 export default function ModalScreen() {
-  const [trackingEnabled, setTrackingEnabled] = useState(false);
-
-  const startStopBackgroundLocation = async (switchState: boolean) => {
-    if (switchState) {
-      const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-      if (foregroundStatus === 'granted') {
-        const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-        if (backgroundStatus === 'granted') {
-          console.log('Start task')
-          setTrackingEnabled(true);
-          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.Highest,
-            deferredUpdatesInterval: 1000
-          });
-        }
-      }
-    }
-    else {
-      console.log('Stop task')
-      await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-      setTrackingEnabled(false);
-    }
-  };
+  const navigation = useNavigation();
+  const colorScheme = useColorScheme();
+  const [user_id, setuser_id] = useState('');
+  const [routeName, setRouteName] = useState('');
 
   useEffect(() => {
-    let TaskStatus = TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
-    TaskStatus.then((value) => {
-      setTrackingEnabled(value)
-    });
-  }, [])
+    setuser_id(getUser_id());
+  }, []);
 
-  console.log(trackingEnabled);
-  return (
-    <View style={styles.container}>
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      <Text style={styles.title}>Enable Tracking</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Switch
-        trackColor={{ false: '#595959', true: '#05c141' }}
-        ios_backgroundColor="#3e3e3e"
-        thumbColor={'#bac1bc'}
-        onValueChange={startStopBackgroundLocation}
-        value={trackingEnabled}
-      ></Switch>
-    </View>
-  );
-}
+  const createRoute = async () => {
+    //Validate info
+    if (routeName == '')
+      return;
 
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-  if (error) {
-    // Error occurred - check `error.message` for more details.
-    console.log(error.message)
-    return;
-  }
-  if (data) {
-    const { locations } = data;
-    console.log(locations)
-    let route_id = 1;
-    let requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: {route_id, locations}
+    const newRoute = {
+      user_id: user_id,
+      name: routeName
     };
 
-    postRequest(requestOptions);
+    const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/create';
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newRoute),
+    }); 
+    if (response.status == 404 || response.status == 400){
+      //seterrorVisible(true);
+      return;
+    }
+    if (response.status != 201){
+      console.log(response)
+      return;
+    }
+
+    response.text().then((data) => {
+      //setUser_id(data);
+      navigation.goBack();
+    });
   }
-});
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Use a light status bar on iOS to account for the black space above the modal */}
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          <Pressable style={{marginTop: -10}} onPress={() => navigation.goBack()}>
+          {({ pressed }) => (
+            <Feather
+              name="x"
+              size={35}
+              color={Colors[colorScheme ?? 'light'].text}
+              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+            />
+            
+          )}
+
+        </Pressable>
+        New Route
+        </Text>
+      </View>
+
+      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+
+      <Text style={styles.title}>Route Name</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        onChangeText={text => setRouteName(text)}
+      />
+      <TouchableOpacity style={styles.button} onPress={createRoute}>
+        <Text style={styles.buttonText}>Create Route</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    //alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  header: {
+    flex: 0.1,
+    backgroundColor: 'white',
+    justifyContent:'space-between',
+    alignItems:'flex-start'
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginTop: -10
   },
   separator: {
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
