@@ -4,7 +4,7 @@ import { Text } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
 import { getUser_id } from '../globals';
 
-const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/';
+const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/1/routes';
 
 export default function TabOneScreen() {
   const navigation = useNavigation();
@@ -71,7 +71,7 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={fakeRoutes} // Use fakeRoutes instead of routes
+        data={routes} // Use fakeRoutes instead of routes
         renderItem={renderRoutePreview}
         keyExtractor={item => item.route_id.toString()}
         contentContainerStyle={styles.routeList} // Apply styles to the content container
