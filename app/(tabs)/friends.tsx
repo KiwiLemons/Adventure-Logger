@@ -4,71 +4,6 @@ import { useNavigation } from '@react-navigation/native'; // Import the useNavig
 import { getUser_id } from '.././globals';
 import placeholderImage from '../../assets/images/defaultPFP.jpg'; // Import default profile picture
 
-// Modal Component for User Account
-const UserModal = ({ visible, user, onClose, onFollow, onUnfollow }) => {
-  if (!visible || !user) return null;
-
-  const handleFollow = async () => {
-    try {
-      const user_id = getUser_id();
-      const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${user.user_id}`, {
-        method: 'POST',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to follow user');
-      }
-      // Update followed users list with user ID
-      onFollow(user.user_id);
-    } catch (error) {
-      console.error('Error following user:', error);
-    }
-  };
-  
-  const handleUnfollow = async () => {
-    try {
-      const user_id = getUser_id();
-      const response = await fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${user.user_id}`, {
-        method: 'POST',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to unfollow user');
-      }
-      // Update followed users list by filtering out the user ID
-      onUnfollow(user.user_id);
-    } catch (error) {
-      console.error('Error unfollowing user:', error);
-    }
-  };
-
-  return (
-    <Modal animationType="slide" transparent visible={visible}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>X</Text>
-          </TouchableOpacity>
-          <Image
-            source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
-            style={styles.modalProfileImage}
-          />
-          <Text style={styles.modalUserName}>{user.userName}</Text>
-
-          {/* Follow/Unfollow buttons */}
-          {user.following ? (
-            <TouchableOpacity onPress={handleUnfollow} style={styles.button}>
-              <Text style={styles.buttonText}>Unfollow</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={handleFollow} style={styles.button}>
-              <Text style={styles.buttonText}>Follow</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
-};
-
 export default function FriendsScreen() {
   const navigation = useNavigation(); // Initialize navigation hook
   const [followedUsers, setFollowedUsers] = useState([]);
@@ -129,6 +64,15 @@ export default function FriendsScreen() {
   const filteredNotFollowedUsers = notFollowedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  // Update follow and unfollow functions in FriendsScreen component
+  const handleFollow = (userId) => {
+    setFollowedUsers([...followedUsers, userId]);
+  };
+
+  const handleUnfollow = (userId) => {
+    setFollowedUsers(followedUsers.filter(id => id !== userId));
+  };
 
   // Show user modal
   const showUserModal = user => {
@@ -194,6 +138,74 @@ export default function FriendsScreen() {
     </View>
   );
 }
+
+// Modal Component for User Account
+const UserModal = ({ visible, user, onClose, onFollow, onUnfollow }) => {
+  if (!visible || !user) return null;
+
+  // Modify handleFollow and handleUnfollow functions in UserModal component
+  // Update follow and unfollow functions in FriendsScreen component
+  const handleFollow = async (userId) => {
+    try {
+      const user_id = getUser_id();
+      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${userId}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to follow user');
+      }
+      // Update followed users list with user ID
+      setFollowedUsers([...followedUsers, userId]);
+    } catch (error) {
+      console.error('Error following user:', error.message);
+    }
+  };
+
+  const handleUnfollow = async (userId) => {
+    try {
+      const user_id = getUser_id();
+      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${userId}`;
+      const response = await fetch(url, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to unfollow user');
+      }
+      // Update followed users list by filtering out the user ID
+      setFollowedUsers(followedUsers.filter(id => id !== userId));
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+    }
+  };
+
+
+  return (
+    <Modal animationType="slide" transparent visible={visible}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>X</Text>
+          </TouchableOpacity>
+          <Image
+            source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+            style={styles.modalProfileImage}
+          />
+          <Text style={styles.modalUserName}>{user.userName}</Text>
+
+          {/* Follow/Unfollow buttons */}
+          {user.following ? (
+            <TouchableOpacity onPress={handleUnfollow} style={styles.button}>
+              <Text style={styles.buttonText}>Unfollow</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={handleFollow} style={styles.button}>
+              <Text style={styles.buttonText}>Follow</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

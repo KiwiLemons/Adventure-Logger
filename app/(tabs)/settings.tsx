@@ -1,43 +1,35 @@
 import React, { useState } from 'react';
-import { StyleSheet, Switch, TouchableOpacity, Text, View, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
-import { launchImageLibrary } from 'react-native-image-picker'; // Import the launchImageLibrary function from react-native-image-picker
+import { StyleSheet, Switch, TouchableOpacity, Text, View, Alert, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'react-native-image-picker';
 
 export default function TabTwoScreen() {
-  const navigation = useNavigation(); // Initialize navigation hook
+  const navigation = useNavigation();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null); // State to store selected profile picture
 
   const toggleDarkMode = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
   const handleSignOut = () => {
-    // Handle sign out logic here
-    // For example, clear user session
-    navigation.navigate('index'); // Navigate to the login screen
+    navigation.navigate('index');
   };
 
   const selectProfilePicture = () => {
-    // Define options for image picker
     const options = {
-      mediaType: 'photo', // Only allow selecting images
-      includeBase64: false, // We don't need base64 data
-    };
-
-    // Launch image picker
-    launchImageLibrary(options, response => {
+      selectionLimit: 1,
+      mediaType: 'photo' as const,
+      includeBase64: false,
+    }
+    launchImageLibrary.showImagePicker(options , (response) => {
       if (response.didCancel) {
-        // User cancelled image selection
-        console.log('User cancelled image selection');
-      } else if (response.error) {
-        // Image picker encountered an error
-        console.log('ImagePicker Error:', response.error);
-        Alert.alert('Error', 'Failed to select image. Please try again later.');
-      } else {
-        // Selected image successfully
-        console.log('Selected image:', response.uri);
-        // Now you can upload the selected image to your database
-        // Make sure to handle the upload logic here
+        console.log('User cancelled image picker');
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorCode);
+      } else if (response.assets) {
+        const imageAssetsArray = response.assets[0].uri
+        
       }
     });
   };
@@ -52,6 +44,7 @@ export default function TabTwoScreen() {
       <TouchableOpacity style={isDarkMode ? [styles.selectPFPButton, styles.darkSelectPFPButton] : styles.selectPFPButton} onPress={selectProfilePicture}>
         <Text style={styles.selectPFPButtonText}>Select Profile Picture</Text>
       </TouchableOpacity>
+      {profilePicture && <Image source={{ uri: profilePicture }} style={{ width: 200, height: 200, marginTop: 20 }} />}
       <TouchableOpacity style={isDarkMode ? [styles.signOutButton, styles.darkSignOutButton] : styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Sign Out</Text>
       </TouchableOpacity>

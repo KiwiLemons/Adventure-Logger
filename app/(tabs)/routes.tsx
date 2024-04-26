@@ -35,8 +35,6 @@ export default function TabOneScreen() {
     { route_id: 1, name: 'Route 1', distance: '10 miles' },
     { route_id: 2, name: 'Route 2', distance: '5 miles' },
     { route_id: 3, name: 'Route 3', distance: '8 miles' },
-    { route_id: 4, name: 'Route 4', distance: '12 miles' },
-    { route_id: 5, name: 'Route 5', distance: '6 miles' },
   ];
 
   const sortRoutesByDistance = () => {
