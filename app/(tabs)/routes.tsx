@@ -14,6 +14,7 @@ export default function TabOneScreen() {
 
   useEffect(() => {
     setuser_id(getUser_id());
+    // TODO: Fix this updating everytime you go back even though you do not create a new route
     fetchRoutes();
   }, []);
 

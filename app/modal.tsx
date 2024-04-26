@@ -1,17 +1,58 @@
 import { StatusBar } from 'expo-status-bar';
 import Feather from '@expo/vector-icons/Feather';
-import { Platform, StyleSheet, Button, Switch, Pressable, useColorScheme } from 'react-native';
+import { Platform, StyleSheet, Button, TouchableOpacity, Pressable, useColorScheme } from 'react-native';
+import { useNavigation } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { Text, View } from '../components/Themed';
 import Colors from '../constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TextInput } from 'react-native-gesture-handler';
+import { getUser_id } from './globals';
 
 
 export default function ModalScreen() {
+  const navigation = useNavigation();
   const colorScheme = useColorScheme();
-  useEffect(() => {
+  const [user_id, setuser_id] = useState('');
+  const [routeName, setRouteName] = useState('');
 
-  }, [])
+  useEffect(() => {
+    setuser_id(getUser_id());
+  }, []);
+
+  const createRoute = async () => {
+    //Validate info
+    if (routeName == '')
+      return;
+
+    const newRoute = {
+      user_id: user_id,
+      name: routeName
+    };
+
+    const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/create';
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newRoute),
+    }); 
+    if (response.status == 404 || response.status == 400){
+      //seterrorVisible(true);
+      return;
+    }
+    if (response.status != 201){
+      console.log(response)
+      return;
+    }
+
+    response.text().then((data) => {
+      //setUser_id(data);
+      navigation.goBack();
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -19,7 +60,7 @@ export default function ModalScreen() {
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       <View style={styles.header}>
         <Text style={styles.title}>
-          <Pressable style={{marginTop: -10}}>
+          <Pressable style={{marginTop: -10}} onPress={() => navigation.goBack()}>
           {({ pressed }) => (
             <Feather
               name="x"
@@ -27,13 +68,25 @@ export default function ModalScreen() {
               color={Colors[colorScheme ?? 'light'].text}
               style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
             />
+            
           )}
+
         </Pressable>
         New Route
         </Text>
       </View>
 
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+
+      <Text style={styles.title}>Route Name</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        onChangeText={text => setRouteName(text)}
+      />
+      <TouchableOpacity style={styles.button} onPress={createRoute}>
+        <Text style={styles.buttonText}>Create Route</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -42,11 +95,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
   header: {
     flex: 0.1,
-    backgroundColor: 'grey',
+    backgroundColor: 'white',
     justifyContent:'space-between',
     alignItems:'flex-start'
   },
@@ -59,5 +112,27 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
