@@ -4,22 +4,27 @@ import { Text } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
 import { getUser_id } from '../globals';
 
-const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/1/routes';
 
 export default function TabOneScreen() {
   const navigation = useNavigation();
-  const [user_id, setuser_id] = useState('');
   const [routes, setRoutes] = useState([]);
   const [sortByDistance, setSortByDistance] = useState(false);
+  const [loading, setLoading] = useState(true);
+  //console.log("This is run")
 
   useEffect(() => {
-    setuser_id(getUser_id());
+
     // TODO: Fix this updating everytime you go back even though you do not create a new route
     fetchRoutes();
   }, []);
 
   const fetchRoutes = async () => {
+    var user_id = getUser_id()
+    if (user_id == "")
+      return;
+    setLoading(true);
     try {
+      var url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/routes`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch routes');
@@ -29,6 +34,7 @@ export default function TabOneScreen() {
     } catch (error) {
       console.error('Error fetching routes:', error);
     }
+    setLoading(false);
   };
 
   const sortRoutesByDistance = () => {
@@ -60,16 +66,27 @@ export default function TabOneScreen() {
     );
   };  
 
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={routes}
-        renderItem={renderRoutePreview}
-        keyExtractor={item => item.route_id.toString()}
-        contentContainerStyle={styles.routeList} // Apply styles to the content container
-      />
-    </View>
-  );
+
+  if (routes.length == 0 && !loading){
+    return(
+      <View style={{flex:1, justifyContent: 'center'}}>
+        <Text style={styles.warningMessage}>No Routes!</Text>
+        <Text style={styles.subWarningMessage}>Click the top right to create a new route</Text>
+      </View>
+    )
+  }
+  else{
+    return (
+      <View style={styles.container}>
+        <FlatList
+          data={routes}
+          renderItem={renderRoutePreview}
+          keyExtractor={item => item.route_id.toString()}
+          contentContainerStyle={styles.routeList} // Apply styles to the content container
+        />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -88,6 +105,16 @@ const styles = StyleSheet.create({
   },
   sortButtonText: {
     fontSize: 16,
+  },
+  warningMessage: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 30,
+  },
+  subWarningMessage: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 20,
   },
   routeList: {
     // paddingHorizontal: 20,
