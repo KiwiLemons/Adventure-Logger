@@ -37,8 +37,9 @@ export default function TabTwoScreen() {
     markers = [];
   }
   else{
-    initialLat = markers[0].coords.latitude
-    initialLong = markers[0].coords.longitude;
+    var last = markers.length - 1;
+    initialLat = markers[last].coords.latitude
+    initialLong = markers[last].coords.longitude;
   }
 
 
