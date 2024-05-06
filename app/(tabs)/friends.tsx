@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, Text, View, Image, TextInput, TouchableOpacity, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
+import { useNavigation } from '@react-navigation/native';
 import { getUser_id } from '.././globals';
-import placeholderImage from '../../assets/images/defaultPFP.jpg'; // Import default profile picture
+import placeholderImage from '../../assets/images/defaultPFP.jpg';
 
 export default function FriendsScreen() {
-  const navigation = useNavigation(); // Initialize navigation hook
+  const navigation = useNavigation();
   const [followedUsers, setFollowedUsers] = useState([]);
   const [errorVisible, setErrorVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [allUsers, setAllUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null); // Track selected user for modal
+  const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('followed');
 
   useEffect(() => {
     const fetchFollowedUsers = async () => {
@@ -53,17 +54,14 @@ export default function FriendsScreen() {
     fetchAllUsers();
   }, []);
 
-  // Filter users not followed
-  // Filter users not followed and not the signed-in user
   const notFollowedUsers = allUsers.filter(user => !followedUsers.some(followedUser => followedUser.user_id === user.user_id && user.user_id !== getUser_id));
-
-  // Filter users based on search text
   const filteredFollowedUsers = followedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
-  const filteredNotFollowedUsers = notFollowedUsers.filter(user => user.user_id !== getUser_id());
+  const filteredNotFollowedUsers = notFollowedUsers.filter(user =>
+    user.userName.toLowerCase().includes(searchText.toLowerCase())
+  );
 
-  // Update follow and unfollow functions in FriendsScreen component
   const handleFollow = (userId) => {
     setFollowedUsers([...followedUsers, userId]);
   };
@@ -72,13 +70,11 @@ export default function FriendsScreen() {
     setFollowedUsers(followedUsers.filter(id => id !== userId));
   };
 
-  // Show user modal
   const showUserModal = user => {
     setSelectedUser(user);
     setIsModalVisible(true);
   };
 
-  // Hide user modal
   const hideUserModal = () => {
     setSelectedUser(null);
     setIsModalVisible(false);
@@ -97,37 +93,49 @@ export default function FriendsScreen() {
         onChangeText={text => setSearchText(text)}
       />
       
-      {/* Followed Users */}
-      <ScrollView style={styles.friendsList}>
-        <Text style={styles.subTitle}>Followed</Text>
-        {filteredFollowedUsers.map(user => (
-          <TouchableOpacity key={user.user_id} style={styles.friendContainer} onPress={() => showUserModal(user)}>
-            <View style={styles.userContainer}>
-              <Image
-                source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
-                style={styles.profileImage}
-              />
-              <Text style={styles.userName}>{user.userName}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity onPress={() => setActiveTab('followed')} style={[styles.tabButton, activeTab === 'followed' && styles.activeTab]}>
+          <Text style={styles.tabText}>Followed</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setActiveTab('unfollowed')} style={[styles.tabButton, activeTab === 'unfollowed' && styles.activeTab]}>
+          <Text style={styles.tabText}>Not Followed</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {activeTab === 'followed' && (
+        <ScrollView style={styles.friendsList}>
+          <Text style={styles.subTitle}>Followed</Text>
+          {filteredFollowedUsers.map(user => (
+            <TouchableOpacity key={user.user_id} style={styles.friendContainer} onPress={() => showUserModal(user)}>
+              <View style={styles.userContainer}>
+                <Image
+                  source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+                  style={styles.profileImage}
+                />
+                <Text style={styles.userName}>{user.userName}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
-      {/* Not Followed Users */}
-      <ScrollView style={styles.friendsList}>
-        <Text style={styles.subTitle}>Not Followed</Text>
-        {filteredNotFollowedUsers.map(user => (
-          <TouchableOpacity key={user.user_id} style={styles.friendContainer} onPress={() => showUserModal(user)}>
-            <View style={styles.userContainer}>
-              <Image
-                source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
-                style={styles.profileImage}
-              />
-              <Text style={styles.userName}>{user.userName}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      {activeTab === 'unfollowed' && (
+        <ScrollView style={styles.friendsList}>
+          <Text style={styles.subTitle}>Not Followed</Text>
+          {filteredNotFollowedUsers.map(user => (
+            <TouchableOpacity key={user.user_id} style={styles.friendContainer} onPress={() => showUserModal(user)}>
+              <View style={styles.userContainer}>
+                <Image
+                  source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+                  style={styles.profileImage}
+                />
+                <Text style={styles.userName}>{user.userName}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
+
       <UserModal
         visible={isModalVisible}
         user={selectedUser}
@@ -313,18 +321,17 @@ const styles = StyleSheet.create({
   // Modal styles
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     backgroundColor: 'white',
-    padding: 100,
+    padding: 120,
     borderRadius: 20, // Increase border radius
     alignItems: 'center',
-    width: '80%', // Adjust width as needed
+    width: '90%', // Adjust width as needed
     alignSelf: 'center', // Center horizontally
-    marginTop: '40%', // Adjust vertical margin as needed
+    marginTop: '30%', // Adjust vertical margin as needed
   },
   modalProfileImage: {
     width: 150, // Adjust image size as needed
@@ -341,16 +348,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 20,
     marginBottom: 20,
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  routeWrapper: {
+    marginRight: 20,
   },
   route: {
-    marginRight: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
     alignItems: 'center',
   },
   routeImage: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderRadius: 10,
     marginBottom: 10,
   },
@@ -379,6 +392,25 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
+    fontWeight: 'bold',
+  },
+  // Tab styles
+  tabContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: 'blue',
+  },
+  tabText: {
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });

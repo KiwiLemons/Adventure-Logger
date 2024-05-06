@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Switch, TouchableOpacity, Text, View, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-picker'; // Import ImagePicker
 
 export default function TabTwoScreen() {
   const navigation = useNavigation();
@@ -19,17 +19,17 @@ export default function TabTwoScreen() {
   const selectProfilePicture = () => {
     const options = {
       selectionLimit: 1,
-      mediaType: 'photo' as const,
+      mediaType: 'photo',
       includeBase64: false,
     }
-    launchImageLibrary.showImagePicker(options , (response) => {
+    ImagePicker.launchImageLibrary(options , (response) => { // Corrected ImagePicker method
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorCode);
       } else if (response.assets) {
-        const imageAssetsArray = response.assets[0].uri
-        
+        const imageAssetsArray = response.assets[0].uri;
+        setProfilePicture(imageAssetsArray);
       }
     });
   };
