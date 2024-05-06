@@ -319,6 +319,81 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   // Modal styles
+  modalContainer: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 120,
+    borderRadius: 20, // Increase border radius
+    alignItems: 'center',
+    width: '90%', // Adjust width as needed
+    alignSelf: 'center', // Center horizontally
+    marginTop: '30%', // Adjust vertical margin as needed
+  },
+  modalProfileImage: {
+    width: 150, // Adjust image size as needed
+    height: 150, // Adjust image size as needed
+    borderRadius: 75, // Adjust border radius to make it circular
+    marginBottom: 20, // Add margin bottom for spacing
+  },
+  modalUserName: {
+    fontSize: 24, // Adjust font size as needed
+    fontWeight: 'bold',
+    textAlign: 'center', // Center text
+  },
+  routeContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    marginBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  routeWrapper: {
+    marginRight: 20,
+  },
+  route: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+  },
+  routeImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  followButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  unfollowButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   // Tab styles
   tabContainer: {
     flexDirection: 'row',
