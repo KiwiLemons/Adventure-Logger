@@ -38,12 +38,12 @@ export default function ModalScreen() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(newRoute),
-    }); 
-    if (response.status == 404 || response.status == 400){
+    });
+    if (response.status == 404 || response.status == 400) {
       //seterrorVisible(true);
       return;
     }
-    if (response.status != 201){
+    if (response.status != 201) {
       console.log(response)
       return;
     }
@@ -60,33 +60,22 @@ export default function ModalScreen() {
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       <View style={styles.header}>
         <Text style={styles.title}>
-          <Pressable style={{marginTop: -10}} onPress={() => navigation.goBack()}>
-          {({ pressed }) => (
-            <Feather
-              name="x"
-              size={35}
-              color={Colors[colorScheme ?? 'light'].text}
-              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-            />
-            
-          )}
-
-        </Pressable>
-        New Route
+          New Route
         </Text>
       </View>
 
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
-      <Text style={styles.title}>Route Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        onChangeText={text => setRouteName(text)}
-      />
-      <TouchableOpacity style={styles.button} onPress={createRoute}>
-        <Text style={styles.buttonText}>Create Route</Text>
-      </TouchableOpacity>
+      <View style={styles.viewItem}>
+        <Text style={styles.title}>Route Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          onChangeText={text => setRouteName(text)}
+        />
+        <TouchableOpacity style={styles.button} onPress={createRoute}>
+          <Text style={styles.buttonText}>Create Route</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -100,13 +89,18 @@ const styles = StyleSheet.create({
   header: {
     flex: 0.1,
     backgroundColor: 'white',
-    justifyContent:'space-between',
-    alignItems:'flex-start'
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    padding: 10,
+  },
+  viewItem: {
+    backgroundColor: 'white',
+    padding: 30
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: -10
+    marginTop: -10,
   },
   separator: {
     marginVertical: 30,
