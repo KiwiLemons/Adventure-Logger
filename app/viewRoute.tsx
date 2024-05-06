@@ -74,14 +74,15 @@ export default function ModalScreen() {
 
   const loadMap = () => {
     try {
-      fetch("https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/1").then(response => {
+      //Get route coords data
+      fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${route.route_id}`).then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch route data');
         }
         response.json().then(data => {
-          var realdata = JSON.parse(data.data)
+          var coordData = JSON.parse(data.data)
           //Put data in marker format
-          navigation.navigate("viewRouteMap", realdata);
+          navigation.navigate("viewRouteMap", coordData);
           //setMarkers(realdata);
           //console.log(realdata); 
         });

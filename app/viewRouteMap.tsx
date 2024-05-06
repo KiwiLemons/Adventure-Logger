@@ -15,45 +15,15 @@ const LATITUDE_DELTA = 0.02;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 
-
-type InputAutocompleteProps = {
-  label: string;
-  placeholder?: string;
-  onPlaceSelected: (details: GooglePlaceDetail | null) => void;
-}
-
-function InputAutocomplete({
-  label,
-  placeholder,
-  onPlaceSelected,
-}: InputAutocompleteProps) {
-  return (
-    <>
-      <Text>{label}</Text>
-      <GooglePlacesAutocomplete
-        styles={{ textInput: styles.input }}
-        placeholder={placeholder || ""}
-        fetchDetails
-        onPress={(data, details = null) => {
-          onPlaceSelected(details);
-        }}
-        query={{
-          key: GOOGLE_API_KEY,
-          language: 'en',
-        }}
-      />
-    </>
-  );
-}
-
 export default function TabTwoScreen() {
   const [origin, setOrigin] = useState<LatLng | null>()
   const [destination, setDestination] = useState<LatLng | null>()
   const [showDirections, setShowDirections] = useState(false)
   const [distance, setDistance] = useState<number | null>(null); // State to hold distance
   const mapRef = useRef<MapView>(null)
-  const markers = useLocalSearchParams();
-  //console.log(markers);
+  var markers = useLocalSearchParams();
+  var initialLat = 32.52363;
+  var initialLong = -92.63904;
 
   const moveTo = async (position: LatLng) => {
     const camera = await mapRef.current?.getCamera()
@@ -63,13 +33,15 @@ export default function TabTwoScreen() {
     }
   }
 
-
-  const edgePadding = {
-    top: 100,
-    bottom: 100,
-    right: 100,
-    left: 100,
+  if (Object.keys(markers) == 0){
+    markers = [];
   }
+  else{
+    initialLat = markers[0].coords.latitude
+    initialLong = markers[0].coords.longitude;
+  }
+
+
   return (
     <View style={styles.container}>
       <MapView
@@ -77,8 +49,8 @@ export default function TabTwoScreen() {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={{
-          latitude: markers[0].coords.latitude,
-          longitude: markers[0].coords.longitude,
+          latitude: initialLat,
+          longitude: initialLong,
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
         }}
