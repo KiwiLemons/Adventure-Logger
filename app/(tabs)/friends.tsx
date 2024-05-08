@@ -13,8 +13,15 @@ export default function FriendsScreen() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('followed');
+  const [user_id, setUser_id] = useState('');
 
   useEffect(() => {
+    getUser_id().then((id) => {
+      if (id !== null){
+        setUser_id(id);
+      }
+    });
+
     const fetchFollowedUsers = async () => {
       try {
         const user_id = await getUser_id();
@@ -54,7 +61,7 @@ export default function FriendsScreen() {
     fetchAllUsers();
   }, []);
 
-  const notFollowedUsers = allUsers.filter(user => !followedUsers.some(followedUser => followedUser.user_id === user.user_id && user.user_id !== getUser_id));
+  const notFollowedUsers = allUsers.filter(user => !followedUsers.some(followedUser => followedUser.user_id === user.user_id && user.user_id !== user_id));
   const filteredFollowedUsers = followedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -181,7 +188,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
   // Follow/unfollow handlers
   const handleFollow = async () => {
     try {
-      const user_id = getUser_id();
+      const user_id = await getUser_id();
       const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${user.user_id}`;
       const response = await fetch(url, {
         method: 'GET',
@@ -199,7 +206,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
 
   const handleUnfollow = async () => {
     try {
-      const user_id = getUser_id();
+      const user_id = await getUser_id();
       const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${user.user_id}`;
       const response = await fetch(url, {
         method: 'GET',
