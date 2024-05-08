@@ -17,7 +17,7 @@ export default function FriendsScreen() {
   useEffect(() => {
     const fetchFollowedUsers = async () => {
       try {
-        const user_id = getUser_id();
+        const user_id = await getUser_id();
         const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/following`;
         const response = await fetch(url);
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, FlatList, Image, View } from 'react-native';
 import { Text } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
-import { getUser_id } from '../globals';
+import { getUser_id, getRoute_id } from '../globals';
 
 
 export default function TabOneScreen() {
@@ -10,18 +10,25 @@ export default function TabOneScreen() {
   const [routes, setRoutes] = useState([]);
   const [sortByDistance, setSortByDistance] = useState(false);
   const [loading, setLoading] = useState(true);
-  //console.log("This is run")
+  const [globalRouteID, setGlobalRouteID] = useState("");
 
   useEffect(() => {
-
+    //Get global route_id which could be null
+    getRoute_id().then((id) => {
+      if (id !== null) {
+        setGlobalRouteID(id);
+      }
+    });
     // TODO: Fix this updating everytime you go back even though you do not create a new route
     fetchRoutes();
   }, []);
 
   const fetchRoutes = async () => {
-    var user_id = getUser_id()
-    if (user_id == "")
+    var user_id = await getUser_id();
+    if (user_id == null){
+      navigation.navigate('index');
       return;
+    }
     setLoading(true);
     try {
       var url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/routes`;
@@ -50,11 +57,11 @@ export default function TabOneScreen() {
   };
 
   const renderRoutePreview = ({ item }) => {
-    const { name, distance } = item;
+    const { name, distance, route_id } = item;
   
     return (
       <TouchableOpacity
-        style={styles.routePreview}
+        style={route_id == globalRouteID ? styles.activeRoutePreview : styles.routePreview}
         onPress={() => navigation.navigate('viewRoute', item)}
       >
         <Image source={require('../../assets/images/MapPlaceholder.jpg')} style={styles.routeImage} />
@@ -121,11 +128,18 @@ const styles = StyleSheet.create({
   },
   routePreview: {
     marginBottom: 20,
+    backgroundColor: '#c9c9c9',
+    borderRadius: 20,
+  },
+  activeRoutePreview: {
+    marginBottom: 20,
+    backgroundColor: '#319e27',
+    borderRadius: 20,
   },
   routeImage: {
     width: '100%',
     height: 250,
-    marginBottom: 10,
+    marginBottom: 4,
     borderRadius: 20, // Add border radius to round the corners
   },
   routeInfoContainer: {
@@ -136,8 +150,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold', // Make the route name bold
     marginRight: 10, // Add spacing between name and distance
+    marginBottom: 6,
+    marginLeft: 10
   },
   routeDistance: {
     fontSize: 14,
+    marginBottom: 5,
   },  
 });

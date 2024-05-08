@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Switch, TouchableOpacity, Text, View, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ImagePicker from 'react-native-image-picker'; // Import ImagePicker
+import {delUser_id} from '../globals'
 
 export default function TabTwoScreen() {
   const navigation = useNavigation();
@@ -13,6 +14,8 @@ export default function TabTwoScreen() {
   };
 
   const handleSignOut = () => {
+    //TODO: check if you are currently tracking a route?
+    delUser_id();
     navigation.navigate('index');
   };
 

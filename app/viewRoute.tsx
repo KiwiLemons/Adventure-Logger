@@ -1,19 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet, Button, Switch, TouchableOpacity } from 'react-native';
+import { Platform, StyleSheet, Button, Switch, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Text, View } from '../components/Themed';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import Colors from '../constants/Colors';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
+import {delRoute_id, getRoute_id, setRoute_id} from './globals';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 
+//Send coordinates to the backend
 const postRequest = async (locations: object) => {
   //Somehow get the route_id here yippie
-  const url = 'https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/1';
+  var route_id = getRoute_id();
+  console.log(route_id)
+  var url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${route_id}`;
   const bodyData = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -38,18 +42,35 @@ const postRequest = async (locations: object) => {
 export default function ModalScreen() {
   //Get the passed param from the navigate function
   const route = useLocalSearchParams() as unknown as route;
+  const pressed_route_id = `${route.route_id}`;
   const navigation = useNavigation();
   const [trackingEnabled, setTrackingEnabled] = useState(false);
-  const [markers, setMarkers] = useState();
-  console.log(route)
+  const [diffRouteTracked, setDiffRouteTracked] = useState(false);
 
-  const startStopBackgroundLocation = async (switchState: boolean) => {
+  useEffect(() => {
+    let TaskStatus = TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
+    getRoute_id().then((route_id) => {
+      TaskStatus.then((value) => {
+        setDiffRouteTracked(route_id != pressed_route_id && route_id != null);
+        setTrackingEnabled(value && route_id == pressed_route_id)
+      });
+    });
+  }, [])
+
+  const startStopBackgroundLocation = async (switchState:boolean) => {
     if (switchState) {
+      console.log(diffRouteTracked);
+      if (diffRouteTracked) {
+        Alert.alert("Cannot start tracking", "Another route is currently being tracked please stop that one first");
+        return;
+      }
+      console.log("start task");
+      setRoute_id(`${pressed_route_id}`);
       const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
       if (foregroundStatus === 'granted') {
         const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
         if (backgroundStatus === 'granted') {
-          console.log('Start task')
+          console.log('Started task')
           setTrackingEnabled(true);
           await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
             accuracy: Location.Accuracy.Highest,
@@ -59,18 +80,14 @@ export default function ModalScreen() {
       }
     }
     else {
-      console.log('Stop task')
+      console.log('Stop task');
+      delRoute_id();
       await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
       setTrackingEnabled(false);
     }
   };
 
-  useEffect(() => {
-    let TaskStatus = TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
-    TaskStatus.then((value) => {
-      setTrackingEnabled(value)
-    });
-  }, [])
+  
 
   const loadMap = () => {
     try {
@@ -95,14 +112,12 @@ export default function ModalScreen() {
     //navigation.navigate("viewRouteMap")
   }
 
-  console.log(trackingEnabled);
   return (
     <View style={styles.container}>
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       <Text style={styles.title}>Tracking</Text>
 
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
       <Switch
         trackColor={{ false: '#595959', true: '#05c141' }}
@@ -137,7 +152,6 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   if (data) {
     const { locations } = data;
     console.log(locations)
-
     postRequest(locations);
   }
 });
