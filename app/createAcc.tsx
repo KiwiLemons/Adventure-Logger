@@ -20,7 +20,13 @@ function SignupScreen() {
     if (password !== confirmPassword) {
       Alert.alert('Passwords do not match');
     } else {
-      fetch(url)
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      })
         .then(response => response.text())
         .then(data => {
           navigation.navigate('index');
