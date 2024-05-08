@@ -19,9 +19,10 @@ export default function TabOneScreen() {
   }, []);
 
   const fetchRoutes = async () => {
-    var user_id = getUser_id()
-    if (user_id == "")
+    var user_id = await getUser_id();
+    if (user_id == null){
       return;
+    }
     setLoading(true);
     try {
       var url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/routes`;

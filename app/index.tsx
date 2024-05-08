@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
-import { setUser_id }  from './globals';
+import { setUser_id, getUser_id } from './globals';
 
 export default function LoginScreen() {
   const navigation = useNavigation(); // Initialize navigation hook
   const [Username, setUsername] = useState('');
   const [Password, setPassword] = useState('');
   const [errorVisible, seterrorVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+
 
   const handleLogin = async () => {
     // Navigate to other screens here
@@ -27,12 +29,12 @@ export default function LoginScreen() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(user),
-    }); 
-    if (response.status == 404 || response.status == 400){
+    });
+    if (response.status == 404 || response.status == 400) {
       seterrorVisible(true);
       return;
     }
-    if (response.status != 200){
+    if (response.status != 200) {
       console.log(response.status)
       return;
     }
@@ -43,9 +45,24 @@ export default function LoginScreen() {
     });
   };
 
+  useLayoutEffect(() => {
+    getUser_id().then((value) => {
+      console.log(value);
+      if (value !== null) {
+        navigation.navigate("(tabs)");
+      }
+      else {
+        setLoading(false);
+      }
+    })
+  }, []);
 
+  //if user is already logged in, log them in again
+  if (loading) {
+    return null;
+  }
   return (
-    <View style={styles.container}>
+    <View style={styles.container}>   
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
