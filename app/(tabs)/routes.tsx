@@ -67,7 +67,6 @@ export default function TabOneScreen() {
         <Image source={require('../../assets/images/MapPlaceholder.jpg')} style={styles.routeImage} />
         <View style={styles.routeInfoContainer}>
           <Text style={styles.routeName}>{name}</Text>
-          <Text style={styles.routeDistance}>{distance} mi</Text>
         </View>
       </TouchableOpacity>
     );
