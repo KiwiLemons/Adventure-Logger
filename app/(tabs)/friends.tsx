@@ -157,7 +157,7 @@ export default function FriendsScreen() {
 // Modal Component for User Account
 const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) => {
   if (!visible || !user) return null;
-
+  const navigation = useNavigation();
   const [userRoutes, setUserRoutes] = useState([]);
   const [isFollowed, setIsFollowed] = useState(false);
 
@@ -222,6 +222,30 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
     }
   };
 
+  const loadMap = (id) => {
+    try {
+      //Get route coords data
+      fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${id}`).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch route data');
+        }
+        response.json().then(data => {
+          var coordData = JSON.parse(data.data)
+          //Put data in marker format
+          navigation.navigate("viewRouteMap", coordData);
+          //setMarkers(realdata);
+          //console.log(realdata); 
+        });
+      });
+    }
+    catch (error) {
+      console.log("wut")
+      console.error('Error fetching route data:', error);
+    } 
+    
+    //navigation.navigate("viewRouteMap")
+  }
+
   return (
     <Modal animationType="slide" transparent visible={visible}>
       <View style={styles.modalContainer}>
@@ -251,12 +275,13 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
             <ScrollView horizontal style={styles.routeContainer}>
               {userRoutes.map(route => (
                 <View key={route.route_id} style={styles.route}>
+                  <TouchableOpacity style={{alignItems:'center'}} onPress={() => {loadMap(route.route_id)}}>
                   <Image
                     source={route.image ? { uri: route.image } : require('../../assets/images/MapPlaceholder.jpg')}
                     style={styles.routeImage}
                   />
                   <Text style={styles.routeName}>{route.name}</Text>
-                  <Text style={styles.routeDistance}>{route.distance} mi</Text>
+                  </TouchableOpacity>
                 </View>
               ))}
             </ScrollView>
@@ -267,6 +292,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
       </View>
     </Modal>
   );
+
 };
 
 const styles = StyleSheet.create({
