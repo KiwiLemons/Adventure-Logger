@@ -126,6 +126,7 @@ export default function TabTwoScreen() {
             apikey={GOOGLE_API_KEY}
             strokeColor='#6644ff'
             strokeWidth={4}
+            mode="WALKING"
           />
         )}
       </MapView>

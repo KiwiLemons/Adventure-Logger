@@ -17,13 +17,23 @@ function SignupScreen() {
       password: password
     };
 
+    const bodyData = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user)
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('Passwords do not match');
     } else {
-      fetch(url)
-        .then(response => response.text())
-        .then(data => {
-          navigation.navigate('index');
+      fetch(url, bodyData)
+        .then(response => {
+          if (response.status == 201){
+            navigation.navigate('index');
+          }
+          else {
+            Alert.alert("Error", "Error creating account")
+          }
         })
         .catch(error => {
           console.error('Error:', error);

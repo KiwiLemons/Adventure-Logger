@@ -13,11 +13,18 @@ export default function FriendsScreen() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('followed');
+  const [user_id, setUser_id] = useState('');
 
   useEffect(() => {
+    getUser_id().then((id) => {
+      if (id !== null){
+        setUser_id(id);
+      }
+    });
+
     const fetchFollowedUsers = async () => {
       try {
-        const user_id = getUser_id();
+        const user_id = await getUser_id();
         const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/following`;
         const response = await fetch(url);
 
@@ -54,7 +61,7 @@ export default function FriendsScreen() {
     fetchAllUsers();
   }, []);
 
-  const notFollowedUsers = allUsers.filter(user => !followedUsers.some(followedUser => followedUser.user_id === user.user_id && user.user_id !== getUser_id));
+  const notFollowedUsers = allUsers.filter(user => !followedUsers.some(followedUser => followedUser.user_id === user.user_id && user.user_id !== user_id));
   const filteredFollowedUsers = followedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -150,7 +157,7 @@ export default function FriendsScreen() {
 // Modal Component for User Account
 const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) => {
   if (!visible || !user) return null;
-
+  const navigation = useNavigation();
   const [userRoutes, setUserRoutes] = useState([]);
   const [isFollowed, setIsFollowed] = useState(false);
 
@@ -181,7 +188,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
   // Follow/unfollow handlers
   const handleFollow = async () => {
     try {
-      const user_id = getUser_id();
+      const user_id = await getUser_id();
       const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/follow?from=${user_id}&to=${user.user_id}`;
       const response = await fetch(url, {
         method: 'GET',
@@ -199,7 +206,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
 
   const handleUnfollow = async () => {
     try {
-      const user_id = getUser_id();
+      const user_id = await getUser_id();
       const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/unfollow?from=${user_id}&to=${user.user_id}`;
       const response = await fetch(url, {
         method: 'GET',
@@ -214,6 +221,30 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
       console.error('Error unfollowing user:', error);
     }
   };
+
+  const loadMap = (id) => {
+    try {
+      //Get route coords data
+      fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${id}`).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch route data');
+        }
+        response.json().then(data => {
+          var coordData = JSON.parse(data.data)
+          //Put data in marker format
+          navigation.navigate("viewRouteMap", coordData);
+          //setMarkers(realdata);
+          //console.log(realdata); 
+        });
+      });
+    }
+    catch (error) {
+      console.log("wut")
+      console.error('Error fetching route data:', error);
+    } 
+    
+    //navigation.navigate("viewRouteMap")
+  }
 
   return (
     <Modal animationType="slide" transparent visible={visible}>
@@ -244,12 +275,13 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
             <ScrollView horizontal style={styles.routeContainer}>
               {userRoutes.map(route => (
                 <View key={route.route_id} style={styles.route}>
+                  <TouchableOpacity style={{alignItems:'center'}} onPress={() => {loadMap(route.route_id)}}>
                   <Image
                     source={route.image ? { uri: route.image } : require('../../assets/images/MapPlaceholder.jpg')}
                     style={styles.routeImage}
                   />
                   <Text style={styles.routeName}>{route.name}</Text>
-                  <Text style={styles.routeDistance}>{route.distance} mi</Text>
+                  </TouchableOpacity>
                 </View>
               ))}
             </ScrollView>
@@ -260,6 +292,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
       </View>
     </Modal>
   );
+
 };
 
 const styles = StyleSheet.create({
