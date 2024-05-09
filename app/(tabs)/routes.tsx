@@ -4,6 +4,11 @@ import { Text } from '../../components/Themed';
 import { useNavigation } from '@react-navigation/native';
 import { getUser_id, getRoute_id } from '../globals';
 
+const routeImages = {
+  '1': require('../../assets/images/carl.jpg'),
+  '2': require('../../assets/images/carl.jpg'),
+  '3': require('../../assets/images/carl.jpg'),
+};
 
 export default function TabOneScreen() {
   const navigation = useNavigation();
@@ -58,19 +63,21 @@ export default function TabOneScreen() {
 
   const renderRoutePreview = ({ item }) => {
     const { name, distance, route_id } = item;
+    const routeImage = routeImages[route_id] || require('../../assets/images/MapPlaceholder.jpg'); // Default image
   
     return (
       <TouchableOpacity
         style={route_id == globalRouteID ? styles.activeRoutePreview : styles.routePreview}
         onPress={() => navigation.navigate('viewRoute', item)}
       >
-        <Image source={require('../../assets/images/MapPlaceholder.jpg')} style={styles.routeImage} />
+        <Image source={routeImage} style={styles.routeImage} />
         <View style={styles.routeInfoContainer}>
           <Text style={styles.routeName}>{name}</Text>
         </View>
       </TouchableOpacity>
     );
-  };  
+  };
+    
 
 
   if (routes.length == 0 && !loading){

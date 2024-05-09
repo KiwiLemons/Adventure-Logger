@@ -60,18 +60,22 @@ export default function TabTwoScreen() {
           coordinates={markers.map((marker) => {
             return {latitude: marker.coords.latitude, longitude: marker.coords.longitude}
           })}
-          strokeWidth={3}
+          strokeWidth={10}
           strokeColor='red'
         />
         {markers.map((marker, index:number) => {
-          var coord = {latitude: marker.coords.latitude, longitude: marker.coords.longitude} as LatLng;
-          return <Marker
-            key={index}
-            coordinate={coord}
-            title={"title"}
-            description={"description"}
-          />
+          // Check if the current marker is either the first or the last in the array
+          if (index === 0 || index === markers.length - 1) {
+            var coord = {latitude: marker.coords.latitude, longitude: marker.coords.longitude} as LatLng;
+            return <Marker
+              key={index}
+              coordinate={coord}
+              title={"Point " + (index === 0 ? "Start" : "End")}
+              description={"description"}
+            />
+          }
         })}
+
       </MapView>
     </View>
   );

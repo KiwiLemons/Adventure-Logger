@@ -4,6 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { getUser_id } from '.././globals';
 import placeholderImage from '../../assets/images/defaultPFP.jpg';
 
+const userProfilePics = {
+  '1': require('../../assets/images/carl.jpg'),
+  '2': require('../../assets/images/DonClawleone.jpg'),
+  '3': require('../../assets/images/GutsSmile.jpg'),
+};
+
 export default function FriendsScreen() {
   const navigation = useNavigation();
   const [followedUsers, setFollowedUsers] = useState([]);
@@ -17,54 +23,59 @@ export default function FriendsScreen() {
 
   useEffect(() => {
     getUser_id().then((id) => {
-      if (id !== null){
-        setUser_id(id);
+      if (id !== null) {
+        setUser_id(id); // Continue to set state for other uses
+  
+        fetchFollowedUsers(id);
+        fetchAllUsers(id);
       }
     });
-
-    const fetchFollowedUsers = async () => {
-      try {
-        const user_id = await getUser_id();
-        const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${user_id}/following`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setFollowedUsers(data);
-      } catch (error) {
-        console.error('Error fetching followed users:', error);
-        setErrorVisible(true);
-      }
-    };
-
-    const fetchAllUsers = async () => {
-      try {
-        const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setAllUsers(data);
-      } catch (error) {
-        console.error('Error fetching all users:', error);
-        setErrorVisible(true);
-      }
-    };
-
-    fetchFollowedUsers();
-    fetchAllUsers();
   }, []);
+  
+  const fetchFollowedUsers = async (userId) => {
+    try {
+      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users/${userId}/following`;
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      setFollowedUsers(data);
+    } catch (error) {
+      console.error('Error fetching followed users:', error);
+      setErrorVisible(true);
+    }
+  };
+  
+  const fetchAllUsers = async (userId) => {
+    try {
+      const url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/users`;
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      const filteredData = data.filter(user => user.user_id !== userId);
+      setAllUsers(filteredData);
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+      setErrorVisible(true);
+    }
+  };
 
-  const notFollowedUsers = allUsers.filter(user => !followedUsers.some(followedUser => followedUser.user_id === user.user_id && user.user_id !== user_id));
+  const notFollowedUsers = allUsers.filter(user => 
+    !followedUsers.some(followedUser => followedUser.user_id === user.user_id) &&
+    user.user_id !== user_id
+  );
+  
   const filteredFollowedUsers = followedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
+  
   const filteredNotFollowedUsers = notFollowedUsers.filter(user =>
     user.userName.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -102,21 +113,20 @@ export default function FriendsScreen() {
       
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('followed')} style={[styles.tabButton, activeTab === 'followed' && styles.activeTab]}>
-          <Text style={styles.tabText}>Followed</Text>
+          <Text style={styles.tabText}>Following</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setActiveTab('unfollowed')} style={[styles.tabButton, activeTab === 'unfollowed' && styles.activeTab]}>
-          <Text style={styles.tabText}>Not Followed</Text>
+          <Text style={styles.tabText}>Recommended</Text>
         </TouchableOpacity>
       </View>
       
       {activeTab === 'followed' && (
         <ScrollView style={styles.friendsList}>
-          <Text style={styles.subTitle}>Followed</Text>
           {filteredFollowedUsers.map(user => (
             <TouchableOpacity key={user.user_id} style={styles.friendContainer} onPress={() => showUserModal(user)}>
               <View style={styles.userContainer}>
                 <Image
-                  source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+                  source={userProfilePics[user.user_id] || placeholderImage}
                   style={styles.profileImage}
                 />
                 <Text style={styles.userName}>{user.userName}</Text>
@@ -128,12 +138,11 @@ export default function FriendsScreen() {
 
       {activeTab === 'unfollowed' && (
         <ScrollView style={styles.friendsList}>
-          <Text style={styles.subTitle}>Not Followed</Text>
           {filteredNotFollowedUsers.map(user => (
             <TouchableOpacity key={user.user_id} style={styles.friendContainer} onPress={() => showUserModal(user)}>
               <View style={styles.userContainer}>
                 <Image
-                  source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+                  source={userProfilePics[user.user_id] || placeholderImage}
                   style={styles.profileImage}
                 />
                 <Text style={styles.userName}>{user.userName}</Text>
@@ -254,7 +263,7 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
             <Text style={styles.closeButtonText}>X</Text>
           </TouchableOpacity>
           <Image
-            source={user.profile_picture ? { uri: user.profile_picture } : placeholderImage}
+            source={userProfilePics[user.user_id] || placeholderImage}
             style={styles.modalProfileImage}
           />
           <Text style={styles.modalUserName}>{user.userName}</Text>
@@ -353,7 +362,6 @@ const styles = StyleSheet.create({
   },
   // Modal styles
   modalContainer: {
-    flex: 1,
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
@@ -381,8 +389,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 50,
     marginBottom: 50,
-    paddingLeft: 150,
-    paddingRight: 150,
+    paddingLeft: 0,
+    paddingRight: 0,
   },
   routeWrapper: {
     marginRight: 20,

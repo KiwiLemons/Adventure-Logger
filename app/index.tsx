@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Text, View } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, Text, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 import { setUser_id, getUser_id } from './globals';
 
@@ -62,7 +62,11 @@ export default function LoginScreen() {
     return null;
   }
   return (
-    <View style={styles.container}>   
+    <View style={styles.container}>
+      <Image
+        source={require('../assets/images/Adventure_Logger_Logo.jpg')}
+        style={styles.logo}
+      />
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
@@ -129,4 +133,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textDecorationLine: 'underline',
   },
+  logo: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 20, 
+  },  
 });
