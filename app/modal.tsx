@@ -13,12 +13,7 @@ import { getUser_id } from './globals';
 export default function ModalScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
-  const [user_id, setuser_id] = useState('');
   const [routeName, setRouteName] = useState('');
-
-  useEffect(() => {
-    setuser_id(getUser_id());
-  }, []);
 
   const createRoute = async () => {
     //Validate info
@@ -26,7 +21,7 @@ export default function ModalScreen() {
       return;
 
     const newRoute = {
-      user_id: user_id,
+      user_id: await getUser_id(),
       name: routeName
     };
 
@@ -49,7 +44,6 @@ export default function ModalScreen() {
     }
 
     response.text().then((data) => {
-      //setUser_id(data);
       navigation.goBack();
     });
   }
