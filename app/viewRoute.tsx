@@ -15,8 +15,7 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 //Send coordinates to the backend
 const postRequest = async (locations: object) => {
   //Somehow get the route_id here yippie
-  var route_id = getRoute_id();
-  console.log(route_id)
+  var route_id = await getRoute_id();
   var url = `https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${route_id}`;
   const bodyData = {
     method: 'POST',
