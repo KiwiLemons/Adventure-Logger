@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
 import { Text } from '../components/Themed';
-import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { LatLng, Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_API_KEY } from '../environments';
 import MapViewDirections from 'react-native-maps-directions';
@@ -56,6 +56,13 @@ export default function TabTwoScreen() {
           longitudeDelta: LONGITUDE_DELTA,
         }}
       >
+        <Polyline
+          coordinates={markers.map((marker) => {
+            return {latitude: marker.coords.latitude, longitude: marker.coords.longitude}
+          })}
+          strokeWidth={3}
+          strokeColor='red'
+        />
         {markers.map((marker, index:number) => {
           var coord = {latitude: marker.coords.latitude, longitude: marker.coords.longitude} as LatLng;
           return <Marker
