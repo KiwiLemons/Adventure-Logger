@@ -5,9 +5,18 @@ import { getUser_id } from '.././globals';
 import placeholderImage from '../../assets/images/defaultPFP.jpg';
 
 const userProfilePics = {
-  '1': require('../../assets/images/carl.jpg'),
-  '2': require('../../assets/images/DonClawleone.jpg'),
-  '3': require('../../assets/images/GutsSmile.jpg'),
+  '1': require('../../assets/images/Kaiden_PFP.png'),
+  '3': require('../../assets/images/jaden_PFP.jpg'),
+  '5': require('../../assets/images/DaxFlame.png'),
+  '6': require('../../assets/images/jared_PFP.jpg'),
+  '7': require('../../assets/images/mak.jpg'),
+  '8': require('../../assets/images/nick_PFP.png'),
+};
+
+const routeImages = {
+  '1': require('../../assets/images/route1preview.jpg'),
+  '2': require('../../assets/images/carl.jpg'),
+  '3': require('../../assets/images/carl.jpg'),
 };
 
 export default function FriendsScreen() {
@@ -286,8 +295,8 @@ const UserModal = ({ visible, user, onClose, setFollowedUsers, followedUsers }) 
                 <View key={route.route_id} style={styles.route}>
                   <TouchableOpacity style={{alignItems:'center'}} onPress={() => {loadMap(route.route_id)}}>
                   <Image
-                    source={route.image ? { uri: route.image } : require('../../assets/images/MapPlaceholder.jpg')}
-                    style={styles.routeImage}
+                    source={routeImages[route.route_id] || require('../../assets/images/MapPlaceholder.jpg')}
+                    style={styles.routeImage} 
                   />
                   <Text style={styles.routeName}>{route.name}</Text>
                   </TouchableOpacity>
