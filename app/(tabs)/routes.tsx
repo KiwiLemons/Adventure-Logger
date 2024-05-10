@@ -5,9 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getUser_id, getRoute_id } from '../globals';
 
 const routeImages = {
-  '1': require('../../assets/images/route1preview.jpg'),
-  '2': require('../../assets/images/carl.jpg'),
-  '3': require('../../assets/images/carl.jpg'),
+  '1': require('../../assets/images/route1preview.jpg')
 };
 
 export default function TabOneScreen() {
