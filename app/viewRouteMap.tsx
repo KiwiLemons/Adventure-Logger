@@ -27,7 +27,6 @@ export default function TabTwoScreen() {
 
   const loadMapData = () => {
     try {
-      console.log("fetching")
       //Get route coords data
       fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${route.route_id}`).then(response => {
         if (!response.ok) {

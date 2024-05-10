@@ -58,12 +58,10 @@ export default function ModalScreen() {
 
   const startStopBackgroundLocation = async (switchState:boolean) => {
     if (switchState) {
-      console.log(diffRouteTracked);
       if (diffRouteTracked) {
         Alert.alert("Cannot start tracking", "Another route is currently being tracked please stop that one first");
         return;
       }
-      console.log("start task");
       setRoute_id(`${pressed_route_id}`);
       const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
       if (foregroundStatus === 'granted') {
@@ -126,7 +124,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   }
   if (data) {
     const { locations } = data;
-    console.log(locations)
+    console.log("Sending Coordinates")
     postRequest(locations);
   }
 });

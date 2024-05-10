@@ -47,7 +47,6 @@ export default function LoginScreen() {
 
   useLayoutEffect(() => {
     getUser_id().then((value) => {
-      console.log(value);
       if (value !== null) {
         navigation.navigate("(tabs)");
       }
