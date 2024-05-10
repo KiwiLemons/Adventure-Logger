@@ -15,8 +15,7 @@ const userProfilePics = {
 
 const routeImages = {
   '1': require('../../assets/images/route1preview.jpg'),
-  '2': require('../../assets/images/carl.jpg'),
-  '3': require('../../assets/images/carl.jpg'),
+  '4': require('../../assets/images/blank_route.jpg'),
 };
 
 export default function FriendsScreen() {
@@ -396,10 +395,8 @@ const styles = StyleSheet.create({
   },
   routeContainer: {
     flexDirection: 'row',
-    marginTop: 50,
-    marginBottom: 50,
-    paddingLeft: 0,
-    paddingRight: 0,
+    marginTop: 20,
+    marginBottom: 20,
   },
   routeWrapper: {
     marginRight: 20,
