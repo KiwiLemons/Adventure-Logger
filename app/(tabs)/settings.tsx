@@ -44,10 +44,6 @@ export default function TabTwoScreen() {
         <Text style={isDarkMode ? styles.darkText : null}>Toggle Theme</Text>
         <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
       </View>
-      <TouchableOpacity style={isDarkMode ? [styles.selectPFPButton, styles.darkSelectPFPButton] : styles.selectPFPButton} onPress={selectProfilePicture}>
-        <Text style={styles.selectPFPButtonText}>Select Profile Picture</Text>
-      </TouchableOpacity>
-      {profilePicture && <Image source={{ uri: profilePicture }} style={{ width: 200, height: 200, marginTop: 20 }} />}
       <TouchableOpacity style={isDarkMode ? [styles.signOutButton, styles.darkSignOutButton] : styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Sign Out</Text>
       </TouchableOpacity>
