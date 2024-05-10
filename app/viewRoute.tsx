@@ -86,30 +86,6 @@ export default function ModalScreen() {
     }
   };
 
-  
-
-  const loadMap = () => {
-    try {
-      //Get route coords data
-      fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${route.route_id}`).then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch route data');
-        }
-        response.json().then(data => {
-          var coordData = JSON.parse(data.data)
-          //Put data in marker format
-          navigation.navigate("viewRouteMap", coordData);
-          //setMarkers(realdata);
-          //console.log(realdata); 
-        });
-      });
-    }
-    catch (error) {
-      console.error('Error fetching route data:', error);
-    } 
-    
-    //navigation.navigate("viewRouteMap")
-  }
 
   return (
     <View style={styles.container}>
@@ -129,7 +105,7 @@ export default function ModalScreen() {
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
       {route.distance == 0 ?
-        <TouchableOpacity style={styles.button} onPress={() => loadMap()}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("viewRouteMap", route)}>
           <Text style={styles.buttonText}>View on Map</Text>
         </TouchableOpacity> :
         <TouchableOpacity style={styles.disabledButton} disabled>

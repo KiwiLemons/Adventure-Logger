@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Dimensions, View, TouchableOpacity, Switch } from 'react-native';
 import { Text } from '../components/Themed';
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -14,34 +14,76 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.02;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-
 export default function TabTwoScreen() {
   const [origin, setOrigin] = useState<LatLng | null>()
   const [destination, setDestination] = useState<LatLng | null>()
-  const [showDirections, setShowDirections] = useState(false)
-  const [distance, setDistance] = useState<number | null>(null); // State to hold distance
+  const [emptyRoute, setEmptyRoute] = useState(false)
+  const [followRoute, setFollowRoute] = useState(true); // State to hold distance
+  const [markers, setMarkers] = useState({route: []})
   const mapRef = useRef<MapView>(null)
-  var markers = useLocalSearchParams();
+  var route = useLocalSearchParams();
   var initialLat = 32.52363;
   var initialLong = -92.63904;
 
-  const moveTo = async (position: LatLng) => {
-    const camera = await mapRef.current?.getCamera()
-    if (camera) {
-      camera.center = position;
-      mapRef.current?.animateCamera(camera, { duration: 1000 })
+  const loadMapData = () => {
+    try {
+      console.log("fetching")
+      //Get route coords data
+      fetch(`https://webserver-image-ccuryd6naa-uc.a.run.app/api/routes/${route.route_id}`).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch route data');
+        }
+        response.json().then(data => {
+          if (data.data !== null){
+            setMarkers({route: JSON.parse(data.data)})
+          }
+          else{
+            setEmptyRoute(true);
+          }
+        });
+      });
+    }
+    catch (error) {
+      console.error('Error fetching route data:', error);
+    } 
+  }
+
+
+  useEffect(() => {
+    loadMapData();
+    const updateMap = setInterval(() => {
+      loadMapData();
+    }, 3000);
+
+    return () => clearInterval(updateMap);
+  }, [])
+
+
+  const startStopFollow = async (switchState:boolean) => {
+    if (switchState) {
+
+    }
+    else {
+
+    }
+  };
+ 
+
+  if (Object.keys(markers.route) == 0){
+    markers.route = [];
+    if (!emptyRoute){
+      return(
+        <View style={styles.container}>
+          <Text>Loading...</Text>
+        </View>
+      );
     }
   }
-
-  if (Object.keys(markers) == 0){
-    markers = [];
-  }
   else{
-    var last = markers.length - 1;
-    initialLat = markers[last].coords.latitude
-    initialLong = markers[last].coords.longitude;
+    var last = markers.route.length - 1;
+    initialLat = markers.route[last].coords.latitude;
+    initialLong = markers.route[last].coords.longitude;
   }
-
 
   return (
     <View style={styles.container}>
@@ -57,15 +99,15 @@ export default function TabTwoScreen() {
         }}
       >
         <Polyline
-          coordinates={markers.map((marker) => {
+          coordinates={markers.route.map((marker) => {
             return {latitude: marker.coords.latitude, longitude: marker.coords.longitude}
           })}
           strokeWidth={10}
           strokeColor='red'
         />
-        {markers.map((marker, index:number) => {
+        {markers.route.map((marker, index:number) => {
           // Check if the current marker is either the first or the last in the array
-          if (index === 0 || index === markers.length - 1) {
+          if (index === 0 || index === markers.route.length - 1) {
             var coord = {latitude: marker.coords.latitude, longitude: marker.coords.longitude} as LatLng;
             return <Marker
               key={index}
@@ -75,7 +117,6 @@ export default function TabTwoScreen() {
             />
           }
         })}
-
       </MapView>
     </View>
   );
